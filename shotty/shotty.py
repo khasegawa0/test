@@ -5,8 +5,14 @@ session = boto3.Session(profile_name='shotty')
 ec2 = session.resource('ec2')
 
 @click.command()
-def list_instances():
+@click.option('--project',default=None,
+    help="only insantance for project (tag project:<name>)")
+def list_instances(project):
     "list EC2 instances"
+    insantances =[]
+
+    if project:
+
     for i in ec2.instances.all():
         print(',''.join((
         i.# IDEA: i.instance_type,
