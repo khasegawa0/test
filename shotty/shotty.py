@@ -18,15 +18,34 @@ def filter_instances(project):
     return instances
 
 @click.group()
+def cli():
+    """shotty managess snapshots"""
+
+@cli.group('volumes')
+def volumes():
+    """commands for volumes"""
+
+@cli.group('instances')
 def instances():
     """commands for instances"""
 
-@instances.command('list')
+@volumes.command('list')
 @click.option ('--project',default=None,
-    help="only insantance for project (tag project:<name>)")
+    help="only volumes for project (tag project:<name>)")
 def list_instances(project):
-    "list EC2 instances"
+    "list EC2 volumes"
     instances = filter_instances(project)
+
+    for i in instances:
+        for v in i.volumes.all():
+            print(", ".join((
+                v.id,
+                i.id,
+                v.state,
+                str(v.size)+"GiB",
+                v.encrypted and "Encrypted" or "Not Encrypted"
+            )))
+    return
 
     for i in instances:
         tags = {t['Key']:t['Value'] for t in i.tags or[]}
@@ -72,4 +91,4 @@ def start_instances(project):
 
 
 if __name__ == '__main__':
-    instances()
+    cli()
